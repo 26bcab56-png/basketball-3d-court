@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>3D Basketball Arena</title>
+
+  <!-- A-Frame -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    #instructions {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      color: white;
+      background: rgba(0,0,0,.55);
+      padding: 14px 18px;
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
+    }
+
+    #instructions h2 {
+      margin: 0 0 5px;
+      font-size: 18px;
+    }
+
+    #instructions p {
+      margin: 0;
+      font-size: 13px;
+      opacity: .85;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="instructions">
+  <h2>🏀 Athletic Arena</h2>
+  <p>Look around • WASD / Arrow Keys to move</p>
+</div>
+
+<a-scene
+  background="color: #8fd3ff"
+  fog="type: exponential; color: #a9dfff; density: 0.012"
+  renderer="antialias: true; colorManagement: true"
+  shadow="type: pcfsoft"
+>
+
+  <!-- =========================
+       ASSETS
+  ========================== -->
+
+  <a-assets>
+
+    <!-- Basketball texture -->
+    <a-mixin
+      id="ball"
+      geometry="primitive: sphere; radius: 0.32; segmentsWidth: 32; segmentsHeight: 32"
+      material="color: #e87520; roughness: 0.65">
+    </a-mixin>
+
+    <!-- Tree -->
+    <a-mixin
+      id="tree-trunk"
+      geometry="primitive: cylinder; radius: .22; height: 2"
+      material="color: #68452d">
+    </a-mixin>
+
+    <a-mixin
+      id="tree-leaves"
+      geometry="primitive: sphere; radius: 1.1"
+      material="color: #207a3b; roughness: 1">
+    </a-mixin>
+
+  </a-assets>
+
+
+  <!-- =========================
+       LIGHTING
+  ========================== -->
+
+  <!-- Bright sunlight -->
+  <a-entity
+    light="
+      type: directional;
+      color: #fff5d6;
+      intensity: 2.2;
+      castShadow: true
+    "
+    position="-20 30 10"
+    rotation="-45 -35 0">
+  </a-entity>
+
+  <!-- Soft sky light -->
+  <a-entity
+    light="
+      type: ambient;
+      color: #c9eaff;
+      intensity: 0.65
+    ">
+  </a-entity>
+
+  <!-- Stadium lights -->
+  <a-entity
+    light="type: point; color: #ffffff; intensity: 2; distance: 30"
+    position="-13 9 -8">
+  </a-entity>
+
+  <a-entity
+    light="type: point; color: #ffffff; intensity: 2; distance: 30"
+    position="13 9 -8">
+  </a-entity>
+
+
+  <!-- =========================
+       GIANT ATHLETIC GROUND
+  ========================== -->
+
+  <a-plane
+    position="0 -0.05 0"
+    rotation="-90 0 0"
+    width="80"
+    height="80"
+    material="
+      color: #3f8f45;
+      roughness: 1
+    "
+    shadow="receive: true">
+  </a-plane>
+
+
+  <!-- Darker training zone -->
+  <a-box
+    position="0 0 0"
+    width="30"
+    height="0.12"
+    depth="22"
+    color="#174d36"
+    shadow="receive: true">
+  </a-box>
+
+
+  <!-- =========================
+       BASKETBALL COURT
+  ========================== -->
+
+  <!-- Court floor -->
+  <a-box
+    position="0 0.08 0"
+    width="28"
+    height="0.16"
+    depth="15"
+    color="#c9783e"
+    shadow="receive: true">
+  </a-box>
+
+  <!-- Court border -->
+  <a-box
+    position="0 0.17 0"
+    width="27.2"
+    height="0.025"
+    depth="14.2"
+    color="#f5eee2">
+  </a-box>
+
+
+  <!-- =========================
+       COURT LINES
+  ========================== -->
+
+  <!-- Center line -->
+  <a-box
+    position="0 0.19 0"
+    width="0.12"
+    height="0.03"
+    depth="14"
+    color="white">
+  </a-box>
+
+  <!-- Center circle -->
+  <a-torus
+    position="0 0.2 0"
+    rotation="90 0 0"
+    radius="2"
+    radius-tubular="0.055"
+    color="white">
+  </a-torus>
+
+
+  <!-- LEFT KEY -->
+  <a-box
+    position="-9 0.2 0"
+    width="5"
+    height="0.03"
+    depth="7"
+    color="white">
+  </a-box>
+
+  <!-- LEFT FREE THROW CIRCLE -->
+  <a-torus
+    position="-6.5 0.22 0"
+    rotation="90 0 0"
+    radius="2"
+    radius-tubular="0.055"
+    color="white">
+  </a-torus>
+
+
+  <!-- RIGHT KEY -->
+  <a-box
+    position="9 0.2 0"
+    width="5"
+    height="0.03"
+    depth="7"
+    color="white">
+  </a-box>
+
+  <!-- RIGHT FREE THROW CIRCLE -->
+  <a-torus
+    position="6.5 0.22 0"
+    rotation="90 0 0"
+    radius="2"
+    radius-tubular="0.055"
+    color="white">
+  </a-torus>
+
+
+  <!-- 3 POINT LINES -->
+  <a-torus
+    position="-10 0.22 0"
+    rotation="90 0 0"
+    radius="5"
+    radius-tubular="0.055"
+    color="white"
+    theta-length="180">
+  </a-torus>
+
+  <a-torus
+    position="10 0.22 0"
+    rotation="90 0 0"
+    radius="5"
+    radius-tubular="0.055"
+    color="white"
+    theta-length="180">
+  </a-torus>
+
+
+  <!-- =========================
+       LEFT BASKET
+  ========================== -->
+
+  <!-- Pole -->
+  <a-cylinder
+    position="-12 3.2 0"
+    radius="0.18"
+    height="6.2"
+    color="#20252b"
+    shadow="cast: true">
+  </a-cylinder>
+
+  <!-- Support arm -->
+  <a-box
+    position="-10.9 5.8 0"
+    width="2.2"
+    height="0.18"
+    depth="0.18"
+    color="#20252b">
+  </a-box>
+
+  <!-- Backboard -->
+  <a-box
+    position="-10.1 5.1 0"
+    width="0.18"
+    height="3"
+    depth="5"
+    color="#eaf7ff"
+    opacity="0.88"
+    transparent="true"
+    shadow="cast: true">
+  </a-box>
+
+  <!-- Backboard inner square -->
+  <a-box
+    position="-10.0 5.1 0"
+    width="0.12"
+    height="1.1"
+    depth="1.8"
+    color="#e33a2c">
+  </a-box>
+
+  <!-- Rim -->
+  <a-torus
+    position="-9.75 4.15 0"
+    rotation="0 90 0"
+    radius="0.75"
+    radius-tubular="0.075"
+    color="#ff4b22"
+    shadow="cast: true">
+  </a-torus>
+
+
+  <!-- NET -->
+  <a-entity id="leftNet">
+
+    <!-- Net strands -->
+    <a-entity
+      position="-9.75 3.85 0"
+      geometry="
+        primitive: cone;
+        radiusBottom: .58;
+        radiusTop: .72;
+        height: 1.2;
+        segmentsRadial: 16;
+        openEnded: true
+      "
+      material="
+        color: #ffffff;
+        wireframe: true;
+        opacity: .85
+      ">
+    </a-entity>
+
+  </a-entity>
+
+
+  <!-- =========================
+       RIGHT BASKET
+  ========================== -->
+
+  <a-cylinder
+    position="12 3.2 0"
+    radius="0.18"
+    height="6.2"
+    color="#20252b"
+    shadow="cast: true">
+  </a-cylinder>
+
+  <a-box
+    position="10.9 5.8 0"
+    width="2.2"
+    height="0.18"
+    depth="0.18"
+    color="#20252b">
+  </a-box>
+
+  <a-box
+    position="10.1 5.1 0"
+    width="0.18"
+    height="3"
+    depth="5"
+    color="#eaf7ff"
+    opacity="0.88"
+    transparent="true"
+    shadow="cast: true">
+  </a-box>
+
+  <a-box
+    position="10.0 5.1 0"
+    width="0.12"
+    height="1.1"
+    depth="1.8"
+    color="#e33a2c">
+  </a-box>
+
+  <a-torus
+    position="9.75 4.15 0"
+    rotation="0 90 0"
+    radius="0.75"
+    radius-tubular="0.075"
+    color="#ff4b22"
+    shadow="cast: true">
+  </a-torus>
+
+  <!-- Right net -->
+  <a-entity
+    position="9.75 3.85 0"
+    geometry="
+      primitive: cone;
+      radiusBottom: .58;
+      radiusTop: .72;
+      height: 1.2;
+      segmentsRadial: 16;
+      openEnded: true
+    "
+    material="
+      color: #ffffff;
+      wireframe: true;
+      opacity: .85
+    ">
+  </a-entity>
+
+
+  <!-- =========================
+       BASKETBALLS
+  ========================== -->
+
+  <a-sphere
+    position="-5 0.65 2"
+    radius="0.32"
+    color="#e87520"
+    shadow="cast: true">
+  </a-sphere>
+
+  <a-sphere
+    position="5 0.65 -2"
+    radius="0.32"
+    color="#e87520"
+    shadow="cast: true">
+  </a-sphere>
+
+  <a-sphere
+    position="0 0.65 3"
+    radius="0.32"
+    color="#e87520"
+    shadow="cast: true">
+  </a-sphere>
+
+
+  <!-- =========================
+       SPORTS EQUIPMENT
+  ========================== -->
+
+  <!-- Training cones -->
+  <a-cone position="-3 0.35 5" radius-bottom=".35" radius-top="0" height=".7" color="#ff5722"></a-cone>
+  <a-cone position="-1.5 0.35 5" radius-bottom=".35" radius-top="0" height=".7" color="#ffd21f"></a-cone>
+  <a-cone position="0 0.35 5" radius-bottom=".35" radius-top="0" height=".7" color="#ff5722"></a-cone>
+  <a-cone position="1.5 0.35 5" radius-bottom=".35" radius-top="0" height=".7" color="#ffd21f"></a-cone>
+  <a-cone position="3 0.35 5" radius-bottom=".35" radius-top="0" height=".7" color="#ff5722"></a-cone>
+
+
+  <!-- =========================
+       BLEACHERS
+  ========================== -->
+
+  <a-box
+    position="0 1.1 -10"
+    width="25"
+    height="2"
+    depth="1"
+    color="#303640">
+  </a-box>
+
+  <a-box
+    position="0 2.2 -10.8"
+    width="23"
+    height="0.8"
+    depth="1"
+    color="#3c4652">
+  </a-box>
+
+  <a-box
+    position="0 3.0 -11.6"
+    width="21"
+    height="0.7"
+    depth="1"
+    color="#4b5662">
+  </a-box>
+
+
+  <!-- =========================
+       STADIUM LIGHT POLES
+  ========================== -->
+
+  <a-cylinder
+    position="-18 5 -8"
+    radius=".18"
+    height="10"
+    color="#30343a">
+  </a-cylinder>
+
+  <a-box
+    position="-18 10 -8"
+    width="3"
+    height=".35"
+    depth=".5"
+    color="#d9e2e8">
+  </a-box>
+
+  <a-cylinder
+    position="18 5 -8"
+    radius=".18"
+    height="10"
+    color="#30343a">
+  </a-cylinder>
+
+  <a-box
+    position="18 10 -8"
+    width="3"
+    height=".35"
+    depth=".5"
+    color="#d9e2e8">
+  </a-box>
+
+
+  <!-- =========================
+       TREES
+  ========================== -->
+
+  <a-entity position="-25 1 -15">
+    <a-cylinder radius=".5" height="3" color="#69452c"></a-cylinder>
+    <a-sphere position="0 2.5 0" radius="2.3" color="#247a3d"></a-sphere>
+  </a-entity>
+
+  <a-entity position="25 1 -15">
+    <a-cylinder radius=".5" height="3" color="#69452c"></a-cylinder>
+    <a-sphere position="0 2.5 0" radius="2.3" color="#247a3d"></a-sphere>
+  </a-entity>
+
+  <a-entity position="-28 1 10">
+    <a-cylinder radius=".5" height="3" color="#69452c"></a-cylinder>
+    <a-sphere position="0 2.5 0" radius="2.3" color="#247a3d"></a-sphere>
+  </a-entity>
+
+  <a-entity position="28 1 10">
+    <a-cylinder radius=".5" height="3" color="#69452c"></a-cylinder>
+    <a-sphere position="0 2.5 0" radius="2.3" color="#247a3d"></a-sphere>
+  </a-entity>
+
+
+  <!-- =========================
+       CLOUDS
+  ========================== -->
+
+  <a-entity position="-15 13 -20">
+    <a-sphere radius="2" color="white"></a-sphere>
+    <a-sphere position="2 0 0" radius="2.5" color="white"></a-sphere>
+    <a-sphere position="4 0 0" radius="1.8" color="white"></a-sphere>
+  </a-entity>
+
+  <a-entity position="15 15 -25">
+    <a-sphere radius="2.2" color="white"></a-sphere>
+    <a-sphere position="2 0 0" radius="2.8" color="white"></a-sphere>
+    <a-sphere position="4.2 0 0" radius="2" color="white"></a-sphere>
+  </a-entity>
+
+  <a-entity position="0 17 10">
+    <a-sphere radius="2" color="white"></a-sphere>
+    <a-sphere position="2 0 0" radius="2.5" color="white"></a-sphere>
+  </a-entity>
+
+
+  <!-- =========================
+       DISTANT MOUNTAINS
+  ========================== -->
+
+  <a-cone
+    position="-25 5 -35"
+    radius-bottom="15"
+    radius-top="0"
+    height="18"
+    color="#6d8e91">
+  </a-cone>
+
+  <a-cone
+    position="0 5 -40"
+    radius-bottom="18"
+    radius-top="0"
+    height="22"
+    color="#789b9d">
+  </a-cone>
+
+  <a-cone
+    position="25 5 -35"
+    radius-bottom="15"
+    radius-top="0"
+    height="17"
+    color="#648487">
+  </a-cone>
+
+
+  <!-- =========================
+       CAMERA
+  ========================== -->
+
+  <a-entity
+    id="player"
+    position="0 3 20"
+    movement-controls="speed: 0.15">
+
+    <a-camera
+      position="0 1.6 0"
+      look-controls="pointerLockEnabled: true">
+    </a-camera>
+
+  </a-entity>
+
+</a-scene>
+
+</body>
+</html>
